@@ -17,4 +17,4 @@ build-backend = "poetry.core.masonry.api"
 
 
 [tool.poetry.scripts]
-bct = 'bctqr.cli:cli'
+bctqr = 'bctqr.cli:cli'
