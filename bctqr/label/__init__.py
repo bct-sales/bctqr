@@ -25,13 +25,20 @@ class SheetSpecifications(pydantic.BaseModel):
     label_width: int
     label_height: int
     corner_radius: int
+    margin: int
 
 
 class _LabelGenerator:
-    def __init__(self, container: shapes.Drawing, label_size: tuple[float, float], label_data: LabelData):
+    __container: shapes.Drawing
+    __label_size: tuple[float, float]
+    __specs: SheetSpecifications
+    __label_data: LabelData
+
+    def __init__(self, *, container: shapes.Drawing, label_size: tuple[float, float], sheet_specifications: SheetSpecifications, label_data: LabelData):
         self.__container = container
         self.__label_size = label_size
         self.__label_data = label_data
+        self.__specs = sheet_specifications
 
     def generate(self) -> None:
         self.__add_background()
@@ -39,7 +46,7 @@ class _LabelGenerator:
         self.__add_description()
         self.__add_price()
         self.__add_charity()
-        self.__add_donation()
+        # self.__add_donation()
 
     def __add_background(self) -> None:
         label_width, label_height = self.__label_size
@@ -54,13 +61,30 @@ class _LabelGenerator:
     def __add_description(self) -> None:
         label_width, label_height = self.__label_size
         description = self.__label_data.description
-        self.__container.add(shapes.String(label_height + 10, label_height/2, description, fontName="Helvetica", fontSize=14))
+        font_size = 14
+        margin = self.__specs.margin
+        self.__container.add(shapes.String(
+            x=label_height + margin,
+            y=label_height - font_size - margin,
+            text=description,
+            fontName="Helvetica",
+            fontSize=font_size
+        ))
 
     def __add_price(self) -> None:
         label_width, label_height = self.__label_size
+        margin = self.__specs.margin
         price_in_cents = self.__label_data.price_in_cents
-        price_string = f'€{price_in_cents / 100:.2f}'
-        self.__container.add(shapes.String(label_height + 10, label_height/4, price_string, fontName="Helvetica", fontSize=14))
+        recipient_id = self.__label_data.recipient_id
+        recipient_string = 'BCT' if recipient_id == 0 else f'#{recipient_id}'
+        price_string = f"€{price_in_cents / 100:.2f} ➞ {recipient_string}"
+        self.__container.add(shapes.String(
+            x=label_height + margin,
+            y=margin,
+            text=price_string,
+            fontName="Helvetica",
+            fontSize=14
+        ))
 
     def __add_charity(self) -> None:
         if self.__label_data.charity:
@@ -69,7 +93,7 @@ class _LabelGenerator:
             image_size = min(label_width * 0.1, label_height * 0.4)
             self.__container.add(shapes.Image(
                 x=label_width - image_size,
-                y=0.1 * image_size,
+                y=(label_height - image_size) / 2,
                 width=image_size * 0.9,
                 height=image_size * 0.9,
                 path=image,
@@ -91,7 +115,13 @@ class _LabelGenerator:
 
 def generate_label(*,
     container: shapes.Drawing,
+    sheet_specifications: SheetSpecifications,
     label_data: LabelData,
     label_size: tuple[float, float]
 ):
-    _LabelGenerator(container=container, label_size=label_size, label_data=label_data).generate()
+    _LabelGenerator(
+        container=container,
+        label_size=label_size,
+        sheet_specifications=sheet_specifications,
+        label_data=label_data,
+    ).generate()

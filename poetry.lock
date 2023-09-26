@@ -415,6 +415,17 @@ freetype-py = ">=2.3"
 pycairo = ">=1.20.0"
 
 [[package]]
+name = "types-pillow"
+version = "10.0.0.3"
+description = "Typing stubs for Pillow"
+optional = false
+python-versions = "*"
+files = [
+    {file = "types-Pillow-10.0.0.3.tar.gz", hash = "sha256:ae0c877d363da349bbb82c5463c9e78037290cc07d3714cb0ceaf5d2f7f5c825"},
+    {file = "types_Pillow-10.0.0.3-py3-none-any.whl", hash = "sha256:54a49f3c6a3f5e95ebeee396d7773dde22ce2515d594f9c0596c0a983558f0d4"},
+]
+
+[[package]]
 name = "typing-extensions"
 version = "4.7.1"
 description = "Backported and Experimental Type Hints for Python 3.7+"
@@ -428,4 +439,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "00ba7fa383d7f9f6c9943e9c1bc2dcad57a256cb8e0b52831793b222f491ced1"
+content-hash = "82ffa0ff016694d6279d81ef82f2c498dea32ec89e37d9160404d050518d1eb1"

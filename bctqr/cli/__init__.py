@@ -21,7 +21,7 @@ class SheetData(pydantic.BaseModel):
 @cli.command()
 @click.argument('input_file', type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True, allow_dash=True))
 @click.argument('output_file', type=click.Path(exists=False))
-def generate(input_file: str, output_file: str):
+def generate(input_file: str, output_file: str) -> int:
     if input_file == '-':
         raw_data = sys.stdin.read()
     else:
@@ -29,13 +29,22 @@ def generate(input_file: str, output_file: str):
             raw_data = file.read()
 
     sheet_data = SheetData.model_validate_json(raw_data)
-    specification = labels.Specification(**sheet_data.sheet_specs.model_dump())
+    sheet_specs = sheet_data.sheet_specs
+    specification = labels.Specification(
+        sheet_width=sheet_specs.sheet_width,
+        sheet_height=sheet_specs.sheet_height,
+        columns=sheet_specs.columns,
+        rows=sheet_specs.rows,
+        label_width=sheet_specs.label_width,
+        label_height=sheet_specs.label_height
+    )
 
     def create_label(label: shapes.Drawing, width: float, height: float, label_data: LabelData):
         generate_label(
             container=label,
             label_size=(width, height),
             label_data=label_data,
+            sheet_specifications=sheet_specs,
         )
 
     sheet = labels.Sheet(
@@ -47,8 +56,4 @@ def generate(input_file: str, output_file: str):
         sheet.add_label(label_data)
 
     sheet.save(output_file)
-
-
-@cli.command()
-def test():
-    load_charity_image()
+    return 0
