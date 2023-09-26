@@ -5,6 +5,18 @@ description = ""
 authors = ["Frederic Vogels <frederic.vogels+github@gmail.com>"]
 readme = "README.md"
 
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.5.1"
+
+[tool.setuptools]
+include_package_data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+mypkg = ["*.png"]
+
 [tool.poetry.dependencies]
 python = "^3.11"
 reportlab = {extras = ["pycairo"], version = "^4.0.4"}
