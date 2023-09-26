@@ -26,6 +26,7 @@ class SheetSpecifications(pydantic.BaseModel):
     label_height: int
     corner_radius: int
     margin: int
+    font_size: int
 
 
 class _LabelGenerator:
@@ -61,7 +62,7 @@ class _LabelGenerator:
     def __add_description(self) -> None:
         label_width, label_height = self.__label_size
         description = self.__label_data.description
-        font_size = 14
+        font_size = self.__specs.font_size
         margin = self.__specs.margin
         self.__container.add(shapes.String(
             x=label_height + margin,
@@ -74,6 +75,7 @@ class _LabelGenerator:
     def __add_price(self) -> None:
         label_width, label_height = self.__label_size
         margin = self.__specs.margin
+        font_size = self.__specs.font_size
         price_in_cents = self.__label_data.price_in_cents
         recipient_id = self.__label_data.recipient_id
         recipient_string = 'BCT' if recipient_id == 0 else f'#{recipient_id}'
@@ -83,7 +85,7 @@ class _LabelGenerator:
             y=margin,
             text=price_string,
             fontName="Helvetica",
-            fontSize=14
+            fontSize=font_size
         ))
 
     def __add_charity(self) -> None:
