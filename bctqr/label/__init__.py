@@ -26,7 +26,9 @@ class SheetSpecifications(pydantic.BaseModel):
     label_height: int
     corner_radius: int
     margin: int
+    spacing: int
     font_size: int
+    border: bool
 
 
 class _LabelGenerator:
@@ -42,12 +44,18 @@ class _LabelGenerator:
         self.__specs = sheet_specifications
 
     def generate(self) -> None:
-        self.__add_background()
+        # self.__add_background()
         self.__add_qr_code()
         self.__add_description()
         self.__add_price()
         self.__add_charity()
         # self.__add_donation()
+        self.__add_border()
+
+    def __add_border(self) -> None:
+        if self.__specs.border:
+            label_width, label_height = self.__label_size
+            self.__container.add(shapes.Rect(0, 0, label_width, label_height, fillColor=colors.transparent))
 
     def __add_background(self) -> None:
         label_width, label_height = self.__label_size
@@ -55,18 +63,23 @@ class _LabelGenerator:
 
     def __add_qr_code(self) -> None:
         label_width, label_height = self.__label_size
+        margin = self.__specs.margin
         qr_data = self.__label_data.qr_data
         qr_image = create_qr_code(qr_data)
-        self.__container.add(shapes.Image(0, 0, label_height, label_height, qr_image))
+        qr_size = label_height - 2 * margin
+        self.__container.add(shapes.Image(margin, margin, qr_size, qr_size, qr_image))
 
     def __add_description(self) -> None:
         label_width, label_height = self.__label_size
         description = self.__label_data.description
         font_size = self.__specs.font_size
         margin = self.__specs.margin
+        spacing = self.__specs.spacing
+        x = label_height + margin
+        y = label_height / 2 + spacing / 2
         self.__container.add(shapes.String(
-            x=label_height + margin,
-            y=label_height - font_size - margin,
+            x=x,
+            y=y,
             text=description,
             fontName="Helvetica",
             fontSize=font_size
@@ -75,14 +88,17 @@ class _LabelGenerator:
     def __add_price(self) -> None:
         label_width, label_height = self.__label_size
         margin = self.__specs.margin
+        spacing = self.__specs.spacing
         font_size = self.__specs.font_size
         price_in_cents = self.__label_data.price_in_cents
         recipient_id = self.__label_data.recipient_id
         recipient_string = 'BCT' if recipient_id == 0 else f'#{recipient_id}'
         price_string = f"€{price_in_cents / 100:.2f} ➞ {recipient_string}"
+        x = label_height + margin
+        y = label_height / 2 - font_size - spacing / 2
         self.__container.add(shapes.String(
-            x=label_height + margin,
-            y=margin,
+            x=x,
+            y=y,
             text=price_string,
             fontName="Helvetica",
             fontSize=font_size
@@ -91,13 +107,16 @@ class _LabelGenerator:
     def __add_charity(self) -> None:
         if self.__label_data.charity:
             label_width, label_height = self.__label_size
+            margin = self.__specs.margin
             image = load_charity_image()
             image_size = min(label_width * 0.1, label_height * 0.4)
+            x = label_width - image_size - margin
+            y = (label_height - image_size) / 2
             self.__container.add(shapes.Image(
-                x=label_width - image_size,
-                y=(label_height - image_size) / 2,
-                width=image_size * 0.9,
-                height=image_size * 0.9,
+                x=x,
+                y=y,
+                width=image_size,
+                height=image_size,
                 path=image,
             ))
 
