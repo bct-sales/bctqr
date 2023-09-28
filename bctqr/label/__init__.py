@@ -11,7 +11,6 @@ class LabelData(pydantic.BaseModel):
     description: str
     price_in_cents: int
     charity: bool
-    donation: bool
     item_id: int
     owner_id: int
     recipient_id: int
