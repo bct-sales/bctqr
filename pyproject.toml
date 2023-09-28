@@ -19,7 +19,7 @@ where = ["src"]
 mypkg = ["*.png"]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.10"
 reportlab = {extras = ["pycairo"], version = "^4.0.4"}
 click = "^8.1.7"
 qrcode = "^7.4.2"
