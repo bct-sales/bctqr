@@ -47,6 +47,7 @@ class _LabelGenerator:
         self.__add_qr_code()
         self.__add_description()
         self.__add_price()
+        self.__add_item_id()
         self.__add_charity()
         # self.__add_donation()
         self.__add_border()
@@ -84,7 +85,7 @@ class _LabelGenerator:
             fontSize=font_size
         ))
 
-    def __add_price(self) -> None:
+    def __add_item_id(self) -> None:
         label_width, label_height = self.__label_size
         margin = self.__specs.margin
         spacing = self.__specs.spacing
@@ -103,6 +104,22 @@ class _LabelGenerator:
             fontSize=font_size
         ))
 
+    def __add_price(self) -> None:
+        label_width, label_height = self.__label_size
+        margin = self.__specs.margin
+        font_size = self.__specs.font_size
+        text = str(self.__label_data.item_id)
+        x = label_width - margin
+        y = label_height - font_size - margin
+        self.__container.add(shapes.String(
+            x=x,
+            y=y,
+            text=text,
+            fontName="Helvetica",
+            fontSize=font_size,
+            textAnchor='end'
+        ))
+
     def __add_charity(self) -> None:
         if self.__label_data.charity:
             label_width, label_height = self.__label_size
@@ -110,7 +127,7 @@ class _LabelGenerator:
             image = load_charity_image()
             image_size = min(label_width * 0.1, label_height * 0.4)
             x = label_width - image_size - margin
-            y = (label_height - image_size) / 2
+            y = margin
             self.__container.add(shapes.Image(
                 x=x,
                 y=y,
