@@ -90,6 +90,7 @@ files = [
 
 [package.dependencies]
 mypy-extensions = ">=1.0.0"
+tomli = {version = ">=1.1.0", markers = "python_version < \"3.11\""}
 typing-extensions = ">=4.1.0"
 
 [package.extras]
@@ -357,6 +358,23 @@ files = [
 ]
 
 [[package]]
+name = "python-barcode"
+version = "0.15.1"
+description = "Create standard barcodes with Python. No external modules needed. (optional Pillow support included)."
+optional = false
+python-versions = "*"
+files = [
+    {file = "python-barcode-0.15.1.tar.gz", hash = "sha256:3b1825fbdb11e597466dff4286b4ea9b1e86a57717b59e563ae679726fc854de"},
+    {file = "python_barcode-0.15.1-py3-none-any.whl", hash = "sha256:057636fba37369c22852410c8535b36adfbeb965ddfd4e5b6924455d692e0886"},
+]
+
+[package.dependencies]
+pillow = {version = "*", optional = true, markers = "extra == \"images\""}
+
+[package.extras]
+images = ["pillow"]
+
+[[package]]
 name = "qrcode"
 version = "7.4.2"
 description = "QR Code image generator"
@@ -415,6 +433,17 @@ freetype-py = ">=2.3"
 pycairo = ">=1.20.0"
 
 [[package]]
+name = "tomli"
+version = "2.0.1"
+description = "A lil' TOML parser"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
+    {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
+]
+
+[[package]]
 name = "types-pillow"
 version = "10.0.0.3"
 description = "Typing stubs for Pillow"
@@ -438,5 +467,5 @@ files = [
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.11"
-content-hash = "82ffa0ff016694d6279d81ef82f2c498dea32ec89e37d9160404d050518d1eb1"
+python-versions = "^3.10"
+content-hash = "a8f7c5ef1cd8188b87bb6b52b64b9f2f9a4c590030f1822d4917aee4f908f0e1"

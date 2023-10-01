@@ -1,5 +1,6 @@
 import click
 from reportlab.graphics import shapes
+from bctqr.barcode import generate_barcode
 from bctqr.images import load_charity_image
 from bctqr.label import LabelData, SheetSpecifications, generate_label
 
