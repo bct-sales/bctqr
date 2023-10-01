@@ -1,12 +1,11 @@
 from reportlab.graphics import shapes
 from reportlab.lib import colors
 from bctqr.images import load_charity_image, load_donation_image
-from bctqr.qr import create_qr_code
+from bctqr.barcode import generate_barcode
 from bctqr.label.defs import LabelData, SheetSpecifications
 
 
-
-class QRLabelGenerator:
+class BarCodeLabelGenerator:
     __container: shapes.Drawing
     __label_size: tuple[float, float]
     __specs: SheetSpecifications
@@ -19,31 +18,32 @@ class QRLabelGenerator:
         self.__specs = sheet_specifications
 
     def generate(self) -> None:
-        # self.__add_background()
-        self.__add_qr_code()
-        self.__add_description()
-        self.__add_item_id()
+        # self.__add_qr_code()
+        self.__add_barcode()
+        # self.__add_description()
+        # self.__add_price()
+        # self.__add_item_id()
         self.__add_price_and_recipient()
         self.__add_charity()
-        # self.__add_donation()
         self.__add_border()
+
+    def __add_barcode(self) -> None:
+        label_width, label_height = self.__label_size
+        margin = self.__specs.margin
+        qr_data = self.__label_data.qr_data
+        image = generate_barcode(qr_data)
+        self.__container.add(shapes.Image(
+            x=0, # Resists urge to put it more to the left! Quiet zone must be respected, lest the barcode might not be able to be read correctly
+            y=(label_height - image.height) / 2,
+            width=image.width,
+            height=image.height,
+            path=image,
+        ))
 
     def __add_border(self) -> None:
         if self.__specs.border:
             label_width, label_height = self.__label_size
             self.__container.add(shapes.Rect(0, 0, label_width, label_height, fillColor=colors.transparent))
-
-    def __add_background(self) -> None:
-        label_width, label_height = self.__label_size
-        self.__container.add(shapes.Rect(0, 0, label_width, label_height, fillColor=colors.red))
-
-    def __add_qr_code(self) -> None:
-        label_width, label_height = self.__label_size
-        margin = self.__specs.margin
-        qr_data = self.__label_data.qr_data
-        qr_image = create_qr_code(qr_data)
-        qr_size = label_height - 2 * margin
-        self.__container.add(shapes.Image(margin, margin, qr_size, qr_size, qr_image))
 
     def __add_description(self) -> None:
         label_width, label_height = self.__label_size
@@ -70,31 +70,17 @@ class QRLabelGenerator:
         recipient_id = self.__label_data.recipient_id
         recipient_string = 'BCT' if recipient_id == 0 else f'#{recipient_id}'
         price_string = f"€{price_in_cents / 100:.2f} ➞ {recipient_string}"
-        x = label_height + margin
-        y = label_height / 2 - font_size - spacing / 2
+        x = label_width - margin
+        y = margin
         self.__container.add(shapes.String(
             x=x,
             y=y,
             text=price_string,
             fontName="Helvetica",
-            fontSize=font_size
+            fontSize=font_size,
+            textAnchor='end',
         ))
 
-    def __add_item_id(self) -> None:
-        label_width, label_height = self.__label_size
-        margin = self.__specs.margin
-        font_size = self.__specs.font_size
-        text = str(self.__label_data.item_id)
-        x = label_width - margin
-        y = label_height - font_size - margin
-        self.__container.add(shapes.String(
-            x=x,
-            y=y,
-            text=text,
-            fontName="Helvetica",
-            fontSize=font_size,
-            textAnchor='end'
-        ))
 
     def __add_charity(self) -> None:
         if self.__label_data.charity:
@@ -103,24 +89,11 @@ class QRLabelGenerator:
             image = load_charity_image()
             image_size = min(label_width * 0.1, label_height * 0.4)
             x = label_width - image_size - margin
-            y = margin
+            y = label_height - image_size - margin
             self.__container.add(shapes.Image(
                 x=x,
                 y=y,
                 width=image_size,
                 height=image_size,
-                path=image,
-            ))
-
-    def __add_donation(self) -> None:
-        if self.__label_data.charity:
-            label_width, label_height = self.__label_size
-            image = load_donation_image()
-            image_size = min(label_width * 0.1, label_height * 0.4)
-            self.__container.add(shapes.Image(
-                x=label_width - image_size,
-                y=label_height - image_size,
-                width=image_size * 0.9,
-                height=image_size * 0.9,
                 path=image,
             ))
