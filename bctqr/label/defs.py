@@ -16,8 +16,8 @@ class SheetSpecifications(pydantic.BaseModel):
     sheet_height: int
     columns: int
     rows: int
-    label_width: int
-    label_height: int
+    label_width: float
+    label_height: float
     corner_radius: int
     margin: int
     spacing: int

@@ -10,7 +10,7 @@ def generate_barcode(data: str) -> Image.Image:
     options = {
         "module_height": 3,
         "module_width": 0.2,
-        "font_size": 3,
+        "font_size": 5,
         "text_distance": 2,
         # "background": "red",
         "quiet_zone": 2.5,
