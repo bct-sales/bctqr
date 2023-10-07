@@ -368,9 +368,6 @@ files = [
     {file = "python_barcode-0.15.1-py3-none-any.whl", hash = "sha256:057636fba37369c22852410c8535b36adfbeb965ddfd4e5b6924455d692e0886"},
 ]
 
-[package.dependencies]
-pillow = {version = "*", optional = true, markers = "extra == \"images\""}
-
 [package.extras]
 images = ["pillow"]
 
@@ -468,4 +465,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "a8f7c5ef1cd8188b87bb6b52b64b9f2f9a4c590030f1822d4917aee4f908f0e1"
+content-hash = "069adb3e668ec5d59ee343b4d9715829c47874834d7e5144aa4e991cef911c6e"

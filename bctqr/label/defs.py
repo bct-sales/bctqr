@@ -4,6 +4,7 @@ import pydantic
 class LabelData(pydantic.BaseModel):
     qr_data: str
     description: str
+    category: str
     price_in_cents: int
     charity: bool
     item_id: int

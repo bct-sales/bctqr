@@ -1,6 +1,6 @@
 from reportlab.graphics import shapes
 from reportlab.lib import colors
-from bctqr.images import load_charity_image, load_donation_image
+from bctqr.images import load_charity_image
 from bctqr.barcode import generate_barcode
 from bctqr.label.defs import LabelData, SheetSpecifications
 
@@ -18,11 +18,11 @@ class BarCodeLabelGenerator:
         self.__specs = sheet_specifications
 
     def generate(self) -> None:
-        # self.__add_qr_code()
+        # self.__add_background()
         self.__add_barcode()
-        # self.__add_description()
-        # self.__add_price()
-        # self.__add_item_id()
+        self.__add_description()
+        self.__add_category()
+        self.__add_item_id()
         self.__add_price_and_recipient()
         self.__add_charity()
         self.__add_border()
@@ -31,14 +31,15 @@ class BarCodeLabelGenerator:
         label_width, label_height = self.__label_size
         margin = self.__specs.margin
         qr_data = self.__label_data.qr_data
-        image = generate_barcode(qr_data)
-        self.__container.add(shapes.Image(
-            x=0, # Resists urge to put it more to the left! Quiet zone must be respected, lest the barcode might not be able to be read correctly
-            y=(label_height - image.height) / 2,
-            width=image.width,
-            height=image.height,
-            path=image,
-        ))
+        barcode = generate_barcode(data=qr_data, width=180)
+        group = shapes.Group()
+        group.add(barcode)
+        group.shift(0, label_height - barcode.height - margin)
+        self.__container.add(group)
+
+    def __add_background(self) -> None:
+        label_width, label_height = self.__label_size
+        self.__container.add(shapes.Rect(0, 0, label_width, label_height, fillColor=colors.red))
 
     def __add_border(self) -> None:
         if self.__specs.border:
@@ -51,12 +52,28 @@ class BarCodeLabelGenerator:
         font_size = self.__specs.font_size
         margin = self.__specs.margin
         spacing = self.__specs.spacing
-        x = label_height + margin
-        y = label_height / 2 + spacing / 2
+        x = margin
+        y = font_size * 3
         self.__container.add(shapes.String(
             x=x,
             y=y,
             text=description,
+            fontName="Helvetica",
+            fontSize=font_size
+        ))
+
+    def __add_category(self) -> None:
+        label_width, label_height = self.__label_size
+        category = self.__label_data.category
+        font_size = self.__specs.font_size
+        margin = self.__specs.margin
+        spacing = self.__specs.spacing
+        x = margin
+        y = font_size * 2
+        self.__container.add(shapes.String(
+            x=x,
+            y=y,
+            text=category,
             fontName="Helvetica",
             fontSize=font_size
         ))
@@ -81,7 +98,6 @@ class BarCodeLabelGenerator:
             textAnchor='end',
         ))
 
-
     def __add_charity(self) -> None:
         if self.__label_data.charity:
             label_width, label_height = self.__label_size
@@ -97,3 +113,19 @@ class BarCodeLabelGenerator:
                 height=image_size,
                 path=image,
             ))
+
+    def __add_item_id(self) -> None:
+        label_width, label_height = self.__label_size
+        margin = self.__specs.margin
+        font_size = self.__specs.font_size
+        text = str(self.__label_data.item_id)
+        x = margin
+        y = margin
+        self.__container.add(shapes.String(
+            x=x,
+            y=y,
+            text=text,
+            fontName="Helvetica",
+            fontSize=font_size,
+            textAnchor='start'
+        ))
