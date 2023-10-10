@@ -1,6 +1,6 @@
 from reportlab.graphics import shapes
 from reportlab.lib import colors
-from bctqr.images import load_charity_image
+from bctqr.images import load_charity_image, load_donation_image
 from bctqr.barcode import generate_barcode
 from bctqr.label.defs import LabelData, SheetSpecifications
 
@@ -23,8 +23,9 @@ class BarCodeLabelGenerator:
         self.__add_description()
         self.__add_category()
         self.__add_item_id()
-        self.__add_price_and_recipient()
+        self.__add_price_and_owner()
         self.__add_charity()
+        self.__add_donation()
         self.__add_border()
 
     def __add_barcode(self) -> None:
@@ -78,15 +79,16 @@ class BarCodeLabelGenerator:
             fontSize=font_size
         ))
 
-    def __add_price_and_recipient(self) -> None:
+    def __add_price_and_owner(self) -> None:
         label_width, label_height = self.__label_size
         margin = self.__specs.margin
         spacing = self.__specs.spacing
         font_size = self.__specs.font_size
         price_in_cents = self.__label_data.price_in_cents
-        recipient_id = self.__label_data.recipient_id
-        recipient_string = 'BCT' if recipient_id == 0 else f'#{recipient_id}'
-        price_string = f"€{price_in_cents / 100:.2f} ➞ {recipient_string}"
+        owner_id = self.__label_data.owner_id
+        # recipient_id = self.__label_data.recipient_id
+        # recipient_string = 'BCT' if recipient_id == 0 else f'#{recipient_id}'
+        price_string = f"€{price_in_cents / 100:.2f} #{owner_id}"
         x = label_width - margin
         y = margin
         self.__container.add(shapes.String(
@@ -106,6 +108,23 @@ class BarCodeLabelGenerator:
             image_size = min(label_width * 0.1, label_height * 0.4)
             x = label_width - image_size - margin
             y = label_height - image_size - margin
+            self.__container.add(shapes.Image(
+                x=x,
+                y=y,
+                width=image_size,
+                height=image_size,
+                path=image,
+            ))
+
+    def __add_donation(self) -> None:
+        # recipient == 0 means it's meant as a donation for the BCT
+        if self.__label_data.recipient_id == 0:
+            label_width, label_height = self.__label_size
+            margin = self.__specs.margin
+            image = load_donation_image()
+            image_size = min(label_width * 0.1, label_height * 0.4)
+            x = label_width - image_size - margin
+            y = label_height - 2 * image_size - margin
             self.__container.add(shapes.Image(
                 x=x,
                 y=y,
