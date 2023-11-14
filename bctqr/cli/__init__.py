@@ -7,7 +7,7 @@ from bctqr.label import LabelData, SheetSpecifications, generate_label
 import labels
 import pydantic
 import sys
-
+from decimal import Decimal
 
 @click.group()
 def cli():
@@ -31,14 +31,12 @@ def generate(input_file: str, output_file: str) -> int:
 
     sheet_data = SheetData.model_validate_json(raw_data)
     sheet_specs = sheet_data.sheet_specs
-    specification = labels.Specification(
-        sheet_width=sheet_specs.sheet_width,
-        sheet_height=sheet_specs.sheet_height,
-        columns=sheet_specs.columns,
-        rows=sheet_specs.rows,
-        label_width=sheet_specs.label_width,
-        label_height=sheet_specs.label_height
-    )
+
+    kwargs = {}
+    for key in ["sheet_width", "sheet_height", "columns", "rows", "label_width", "label_height", "corner_radius", "left_margin", "right_margin", "top_margin", "bottom_margin"]:
+        if value := getattr(sheet_specs, key):
+            kwargs[key] = value
+    specification = labels.Specification(**kwargs)
 
     def create_label(label: shapes.Drawing, width: float, height: float, label_data: LabelData):
         generate_label(

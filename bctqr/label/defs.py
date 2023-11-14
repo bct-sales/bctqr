@@ -1,3 +1,4 @@
+from typing import Optional
 import pydantic
 
 
@@ -20,6 +21,10 @@ class SheetSpecifications(pydantic.BaseModel):
     label_width: float
     label_height: float
     corner_radius: int
+    left_margin: Optional[float] = None
+    right_margin: Optional[float] = None
+    top_margin: Optional[float] = None
+    bottom_margin: Optional[float] = None
     margin: int
     spacing: int
     font_size: int
